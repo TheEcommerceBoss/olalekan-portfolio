@@ -91,7 +91,6 @@ export function Contact() {
       </div>
       <footer className="footer">
         <span>© {new Date().getFullYear()} Olalekan Ajimoti</span>
-        <span>Built with React Three Fiber, ShaderGradient, Paper Shaders and Liquid Glass</span>
       </footer>
     </section>
   );
