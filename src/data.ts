@@ -92,10 +92,10 @@ export const work: Work[] = [
   },
   {
     name: "The Ecommerce Boss",
-    title: "Forms, spreadsheets and email, made traceable",
-    tag: "Process automation",
-    summary: "As-Is and To-Be workflows connecting forms, Airtable, Make and Zapier.",
-    href: `${REPO}/01-delivered-case-studies/ecommerce-boss-event-automation`,
+    title: "Business analysis for small businesses",
+    tag: "SME consulting · Marketing ops · Web",
+    summary: "Turning \"we need a website\" into agreed goals, prioritised scope, one record for every enquiry and measurable results.",
+    href: `${REPO}/01-delivered-case-studies/ecommerce-boss-sme-consulting`,
     accent: "#E5E5E5",
   },
   {

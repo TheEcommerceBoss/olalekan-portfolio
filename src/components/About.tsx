@@ -61,7 +61,7 @@ export default function About() {
           At BOZ Jewelry I learned that technology projects succeed or fail on people. At HunterTV Africa I owned a live
           ticketing platform and learned to follow a customer complaint all the way down to the system that caused it.
         </p>
-        <p className="about-lead">Today I bring all three to every brief: the data, the people and the system.</p>
+        <p className="about-lead">Through The Ecommerce Boss, I now bring all three to small businesses: the data, the people and the system behind every request for a website or more sales.</p>
         <dl className="facts">
           {facts.map(([k, v]) => (
             <div key={k} className="fact"><dt>{k}</dt><dd>{v}</dd></div>
