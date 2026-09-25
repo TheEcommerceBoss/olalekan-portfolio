@@ -7,13 +7,14 @@ import { links } from "../data";
 
 export default function Hero() {
   const ref = useRef<HTMLElement>(null);
+  const calm = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   return (
     <section ref={ref} className="hero" id="top">
       <ShaderGradientCanvas className="hero-gradient" pixelDensity={1} fov={45} pointerEvents="none" lazyLoad={false}>
         <ShaderGradient
           control="props"
           type="waterPlane"
-          animate="on"
+          animate={calm ? "off" : "on"}
           uSpeed={0.18}
           uStrength={2.6}
           uDensity={1.4}
@@ -39,7 +40,7 @@ export default function Hero() {
         />
       </ShaderGradientCanvas>
       <div className="hero-veil" />
-      <GlassObjects />
+      {!calm && <GlassObjects />}
 
       <div className="hero-inner">
         <div className="hero-mark" aria-label="Olalekan Ajimoti monogram">
