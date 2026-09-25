@@ -130,7 +130,9 @@ export default function FlowMap() {
               <g key={l} className="fm-lane">
                 <rect x={0} y={i * LANE_H} width={W} height={LANE_H} className={i % 2 ? "fm-lane-alt" : "fm-lane-bg"} />
                 <rect x={0} y={i * LANE_H} width={HEAD_W - 20} height={LANE_H} className="fm-lane-head" />
-                <text x={(HEAD_W - 20) / 2} y={laneY(i) + 5} textAnchor="middle" className="fm-lane-label">{l}</text>
+                <text x={(HEAD_W - 20) / 2} y={laneY(i) + 5 - (l.split(" ").length - 1) * 9} textAnchor="middle" className="fm-lane-label">
+                  {l.split(" ").map((w, j) => <tspan key={j} x={(HEAD_W - 20) / 2} dy={j ? 18 : 0}>{w}</tspan>)}
+                </text>
                 {i > 0 && <line x1={0} x2={W} y1={i * LANE_H} y2={i * LANE_H} className="fm-divider" />}
               </g>
             ))}
