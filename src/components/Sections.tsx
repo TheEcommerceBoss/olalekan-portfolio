@@ -12,6 +12,7 @@ export function Nav() {
           <a href="#top" className="nav-name">OA</a>
           <a href="#about">About</a>
           <a href="#approach">Approach</a>
+          <a href="#flow">Process</a>
           <a href="#work">Work</a>
           <a href="#contact">Contact</a>
         </span>
