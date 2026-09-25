@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { chapters } from "../data";
+import { useInView } from "./useInView";
 
 type Progress = { current: number };
 
@@ -132,6 +133,7 @@ export default function ScrollWorld() {
   const progress = useRef<Progress>({ current: 0 }).current;
   const [active, setActive] = useState(0);
   const [pct, setPct] = useState(0);
+  const visible = useInView(section);
   const count = typeof window !== "undefined" && window.innerWidth < 700 ? 3000 : 6000;
 
   useEffect(() => {
@@ -157,7 +159,7 @@ export default function ScrollWorld() {
   return (
     <section ref={section} className="world" id="approach" aria-label="How I work">
       <div className="world-sticky">
-        <Canvas className="world-canvas" camera={{ position: [0, 1.5, 15], fov: 50 }} dpr={[1, 1.75]}
+        <Canvas className="world-canvas" camera={{ position: [0, 1.5, 15], fov: 50 }} dpr={[1, 1.25]} frameloop={visible ? "always" : "never"}
           eventSource={typeof document !== "undefined" ? document.body : undefined}
           gl={{ antialias: false, powerPreference: "high-performance" }}>
           <Particles progress={progress} count={count} />

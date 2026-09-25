@@ -1,20 +1,24 @@
-import { useRef } from "react";
+import { lazy, Suspense, useRef } from "react";
 import { ShaderGradientCanvas, ShaderGradient } from "@shadergradient/react";
 import { LiquidMetal } from "@paper-design/shaders-react";
 import Glass from "./Glass";
-import GlassObjects from "./GlassObjects";
+import { useInView } from "./useInView";
+
+// three.js extras for the glass shapes load after first paint
+const GlassObjects = lazy(() => import("./GlassObjects"));
 import { links } from "../data";
 
 export default function Hero() {
   const ref = useRef<HTMLElement>(null);
   const calm = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const visible = useInView(ref, "0px");
   return (
     <section ref={ref} className="hero" id="top">
-      <ShaderGradientCanvas className="hero-gradient" pixelDensity={1} fov={45} pointerEvents="none" lazyLoad={false}>
+      <ShaderGradientCanvas className="hero-gradient" pixelDensity={1} fov={45} pointerEvents="none" lazyLoad threshold={0}>
         <ShaderGradient
           control="props"
           type="waterPlane"
-          animate={calm ? "off" : "on"}
+          animate={calm || !visible ? "off" : "on"}
           uSpeed={0.18}
           uStrength={2.6}
           uDensity={1.4}
@@ -40,7 +44,7 @@ export default function Hero() {
         />
       </ShaderGradientCanvas>
       <div className="hero-veil" />
-      {!calm && <GlassObjects />}
+      {!calm && <Suspense fallback={null}><GlassObjects active={visible} /></Suspense>}
 
       <div className="hero-inner">
         <div className="hero-mark" aria-label="Olalekan Ajimoti monogram">

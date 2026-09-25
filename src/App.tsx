@@ -1,9 +1,11 @@
+import { lazy, Suspense } from "react";
 import About from "./components/About";
 import Hero from "./components/Hero";
-import ScrollWorld from "./components/ScrollWorld";
 import { Contact, Nav, Stats, Work } from "./components/Sections";
 import { Cursor, Ticker } from "./components/Playful";
 import FlowMap from "./components/FlowMap";
+
+const ScrollWorld = lazy(() => import("./components/ScrollWorld"));
 
 export default function App() {
   return (
@@ -13,7 +15,7 @@ export default function App() {
       <main>
         <Hero />
         <About />
-        <ScrollWorld />
+        <Suspense fallback={<section className="world" id="approach" />}><ScrollWorld /></Suspense>
         <Ticker />
         <FlowMap />
         <Stats />

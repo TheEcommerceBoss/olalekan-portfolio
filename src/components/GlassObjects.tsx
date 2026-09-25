@@ -1,6 +1,7 @@
 import { useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Environment, Float, Lightformer, MeshTransmissionMaterial } from "@react-three/drei";
+import { Environment, Float, Lightformer, MeshTransmissionMaterial, PerformanceMonitor } from "@react-three/drei";
+import { useState } from "react";
 import * as THREE from "three";
 
 // Chrome-glass shapes that drift and lean towards the pointer.
@@ -22,19 +23,22 @@ function Shape({ geometry, position, scale, color, speed, glow }: {
     <Float speed={speed * 1.6} rotationIntensity={0.6} floatIntensity={1.2}>
       <mesh ref={mesh} position={position} scale={scale}>
         {geometry}
-        <MeshTransmissionMaterial samples={4} resolution={256} thickness={0.6} roughness={0.05} ior={1.35}
+        <MeshTransmissionMaterial samples={3} resolution={256} thickness={0.6} roughness={0.05} ior={1.35}
           chromaticAberration={0.35} anisotropy={0.2} distortion={0.3} distortionScale={0.4} temporalDistortion={0.1}
-          backside color={color} transmission={1} background={bg} />
+          color={color} transmission={1} background={bg} />
       </mesh>
     </Float>
   );
 }
 
-export default function GlassObjects() {
+export default function GlassObjects({ active = true }: { active?: boolean }) {
+  const [dpr, setDpr] = useState(1.25);
   const small = typeof window !== "undefined" && window.innerWidth < 700;
   return (
-    <Canvas className="hero-objects" camera={{ position: [0, 0, 8], fov: 40 }} dpr={[1, 1.5]}
+    <Canvas className="hero-objects" camera={{ position: [0, 0, 8], fov: 40 }} dpr={dpr} frameloop={active ? "always" : "never"}
       gl={{ alpha: true, antialias: true, powerPreference: "high-performance" }} eventSource={typeof document !== "undefined" ? document.body : undefined}>
+      {/* drop resolution on machines that cannot hold the frame rate */}
+      <PerformanceMonitor onDecline={() => setDpr(1)} />
       <Shape geometry={<torusKnotGeometry args={[0.9, 0.3, 160, 24]} />} position={small ? [1.4, 2.6, 0] : [-4.6, 1.4, 0]} scale={small ? 0.55 : 0.85} color="#ffd9c7" speed={1} glow="#ff6a3d" />
       <Shape geometry={<icosahedronGeometry args={[1, 0]} />} position={small ? [-1.5, -2.9, 0] : [4.7, -1.2, 0.5]} scale={small ? 0.6 : 0.95} color="#d8d2ff" speed={1.3} glow="#6d5cff" />
       {!small && <Shape geometry={<torusGeometry args={[0.8, 0.28, 32, 96]} />} position={[3.9, 2.3, -1]} scale={0.7} color="#ffffff" speed={0.8} glow="#c04dff" />}

@@ -10,6 +10,7 @@ export function Cursor() {
     let x = innerWidth / 2, y = innerHeight / 2, rx = x, ry = y, raf = 0;
     const move = (e: PointerEvent) => {
       x = e.clientX; y = e.clientY;
+      if (!raf) raf = requestAnimationFrame(tick);
       const hot = (e.target as HTMLElement).closest("a, button");
       ring.current?.classList.toggle("is-hot", Boolean(hot));
     };
@@ -19,7 +20,8 @@ export function Cursor() {
       rx += (x - rx) * 0.18; ry += (y - ry) * 0.18;
       if (dot.current) dot.current.style.transform = `translate(${x}px, ${y}px)`;
       if (ring.current) ring.current.style.transform = `translate(${rx}px, ${ry}px)`;
-      raf = requestAnimationFrame(tick);
+      // sleep once the ring has caught up; the next pointer move wakes it
+      raf = Math.abs(x - rx) + Math.abs(y - ry) > 0.2 ? requestAnimationFrame(tick) : 0;
     };
     tick();
     addEventListener("pointermove", move);
