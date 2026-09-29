@@ -7,35 +7,6 @@ export const links = {
   cv: "/Olalekan_Ajimoti_Business_Analyst_CV.pdf",
 };
 
-export type Chapter = { num: string; verb: string; line: string; proof: string };
-
-export const chapters: Chapter[] = [
-  {
-    num: "01",
-    verb: "Discover",
-    line: "Every brief hides a better question.",
-    proof: "A festival asked for a registration website. Underneath were three different journeys: attendees, vendors and volunteers.",
-  },
-  {
-    num: "02",
-    verb: "Define",
-    line: "Complaints are data wearing a disguise.",
-    proof: "Two duplicate-charge emails traced back to one timing fault in how payments became tickets.",
-  },
-  {
-    num: "03",
-    verb: "Design",
-    line: "Draw the flow before anyone builds it.",
-    proof: "As-Is and To-Be swimlanes, decision tables and a traceability matrix for every requirement.",
-  },
-  {
-    num: "04",
-    verb: "Deliver",
-    line: "Test it the way real people will break it.",
-    proof: "Tickets now arrive the moment payment clears. 90+ prioritised changes shipped in 10 weeks.",
-  },
-];
-
 export type Work = { name: string; title: string; tag: string; summary: string; href: string; accent: string; featured?: boolean };
 
 export const work: Work[] = [
