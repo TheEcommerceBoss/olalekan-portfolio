@@ -340,14 +340,45 @@ function Window({ s, children }: { s: Stage; children: ReactNode }) {
   );
 }
 
+// Phones: stages stack, and each artefact builds as its window scrolls up the screen.
+function MobileStage({ s, i, calm }: { s: Stage; i: number; calm: boolean }) {
+  const win = useRef<HTMLDivElement>(null);
+  const [t, setT] = useState(calm ? 1 : 0);
+  useEffect(() => {
+    if (calm) { setT(1); return; }
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const el = win.current;
+      if (!el) return;
+      const top = el.getBoundingClientRect().top, vh = window.innerHeight;
+      // starts as the window enters the bottom of the screen, completes by the time it reaches the upper third
+      setT(clamp((vh * 0.95 - top) / (vh * 0.7)));
+    };
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
+    update();
+    addEventListener("scroll", onScroll, { passive: true });
+    addEventListener("resize", onScroll);
+    return () => { removeEventListener("scroll", onScroll); removeEventListener("resize", onScroll); cancelAnimationFrame(raf); };
+  }, [calm]);
+  return (
+    <article className="kit-block">
+      <StageText s={s} i={i} />
+      <div ref={win}><Window s={s}><s.Art t={t} /></Window></div>
+    </article>
+  );
+}
+
 export default function Toolkit() {
   const section = useRef<HTMLElement>(null);
   const [p, setP] = useState(0);
   const [stacked, setStacked] = useState(false);
+  const [calm, setCalm] = useState(false);
 
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 900px), (prefers-reduced-motion: reduce)");
-    const set = () => setStacked(mq.matches);
+    const still = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const set = () => { setStacked(mq.matches); setCalm(still.matches); };
     set();
     mq.addEventListener("change", set);
     let raf = 0;
@@ -377,12 +408,7 @@ export default function Toolkit() {
     return (
       <section className="kit kit-stacked" id="approach" aria-label="The BA toolkit">
         {head}
-        {stages.map((s, i) => (
-          <article key={s.verb} className="kit-block">
-            <StageText s={s} i={i} />
-            <Window s={s}><s.Art t={1} /></Window>
-          </article>
-        ))}
+        {stages.map((s, i) => <MobileStage key={s.verb} s={s} i={i} calm={calm} />)}
       </section>
     );
   }
