@@ -340,32 +340,63 @@ function Window({ s, children }: { s: Stage; children: ReactNode }) {
   );
 }
 
-// Phones: stages stack, and each artefact builds as its window scrolls up the screen.
-function MobileStage({ s, i, calm }: { s: Stage; i: number; calm: boolean }) {
-  const win = useRef<HTMLDivElement>(null);
-  const [t, setT] = useState(calm ? 1 : 0);
+// Phones: the section pins and each stage slides up as a card over the last, building its artefact as you scroll.
+function MobileDeck({ head }: { head: ReactNode }) {
+  const section = useRef<HTMLElement>(null);
+  const [pos, setPos] = useState(0);
+  const n = stages.length;
   useEffect(() => {
-    if (calm) { setT(1); return; }
     let raf = 0;
     const update = () => {
       raf = 0;
-      const el = win.current;
+      const el = section.current;
       if (!el) return;
-      const top = el.getBoundingClientRect().top, vh = window.innerHeight;
-      // starts as the window enters the bottom of the screen, completes by the time it reaches the upper third
-      setT(clamp((vh * 0.95 - top) / (vh * 0.7)));
+      const r = el.getBoundingClientRect();
+      const span = r.height - window.innerHeight;
+      // a little dwell at the end so the last card finishes before the page moves on
+      setPos(clamp(span > 0 ? -r.top / span : 0) * (n - 0.001));
     };
     const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
     update();
     addEventListener("scroll", onScroll, { passive: true });
     addEventListener("resize", onScroll);
     return () => { removeEventListener("scroll", onScroll); removeEventListener("resize", onScroll); cancelAnimationFrame(raf); };
-  }, [calm]);
+  }, [n]);
+
+  const active = Math.floor(pos);
+  const ENTER = 0.3; // share of each stage's scroll spent sliding the card in
   return (
-    <article className="kit-block">
-      <StageText s={s} i={i} />
-      <div ref={win}><Window s={s}><s.Art t={t} /></Window></div>
-    </article>
+    <section ref={section} className="kit kit-deck" id="approach" aria-label="The BA toolkit" style={{ height: `${n * 110 + 40}svh` }}>
+      <div className="kit-deck-sticky">
+        {head}
+        <div className="kit-deck-rail" aria-hidden="true">
+          {stages.map((st, i) => <span key={st.verb} className={i === active ? "is-active" : i < active ? "is-done" : ""} />)}
+        </div>
+        <div className="kit-deck-stack">
+          {stages.map((s, i) => {
+            if (i < active - 2 || i > active + 1) return null;
+            const local = pos - i;
+            // slide in during the last part of the previous stage
+            const enter = i === 0 ? 1 : ease(clamp((local + ENTER) / ENTER));
+            // shrink back as the next card covers it
+            const cover = i === n - 1 ? 0 : clamp((pos - (i + 1) + ENTER) / ENTER) + (i < active ? active - 1 - i : 0);
+            const t = clamp(local / (1 - ENTER));
+            return (
+              <article key={s.verb} className="kit-mcard" aria-hidden={i !== active}
+                style={{ transform: `translateY(${(1 - enter) * 105}%) translateY(${-cover * 14}px) scale(${1 - cover * 0.05})`,
+                  filter: cover > 0 ? `brightness(${1 - Math.min(cover, 1) * 0.45})` : undefined, zIndex: i }}>
+                <p className="kit-num">{String(i + 1).padStart(2, "0")} / {s.verb}</p>
+                <h3 className="kit-line">{s.line}</h3>
+                <p className="kit-proof">{s.proof}</p>
+                <Window s={s}><s.Art t={t} /></Window>
+                <ul className="kit-chips kit-chips-tools">{s.tools.map((x) => <li key={x}>{x}</li>)}</ul>
+                <p className="kit-mtech">{s.techniques.join(" · ")}</p>
+              </article>
+            );
+          })}
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -404,11 +435,17 @@ export default function Toolkit() {
     </header>
   );
 
+  if (stacked && !calm) return <MobileDeck head={head} />;
   if (stacked) {
     return (
       <section className="kit kit-stacked" id="approach" aria-label="The BA toolkit">
         {head}
-        {stages.map((s, i) => <MobileStage key={s.verb} s={s} i={i} calm={calm} />)}
+        {stages.map((s, i) => (
+          <article key={s.verb} className="kit-block">
+            <StageText s={s} i={i} />
+            <Window s={s}><s.Art t={1} /></Window>
+          </article>
+        ))}
       </section>
     );
   }
